@@ -41,7 +41,7 @@
       semanticCommitType: "fix",
       semanticCommitScope: "helm",
     },
-    
+
     {
       matchDatasources: ["github-releases", "github-tags"],
       matchUpdateTypes: ["major"],
