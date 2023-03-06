@@ -1,0 +1,12 @@
+{
+  "files.associations": {
+    // "*.json5": "jsonc",
+  },
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": true,
+  "editor.guides.bracketPairsHorizontal": true,
+  "editor.guides.highlightActiveBracketPair": true,
+  "files.trimTrailingWhitespace": true,
+  "sops.enabled": true,
+  "sops.creationEnabled": true
+}

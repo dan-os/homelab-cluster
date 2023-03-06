@@ -1,0 +1,198 @@
+---
+clusterName: homelab-cluster
+
+talosVersion: v1.3.5
+kubernetesVersion: v1.26.2
+
+endpoint: https://${clusterEndpointIP}:6443
+domain: cluster.local
+
+additionalMachineCertSans:
+  - ${clusterEndpointIP}
+  - ${clusterDomainName}
+additionalApiServerCertSans:
+  - ${clusterDomainName}
+
+clusterPodNets:
+  - 10.244.0.0/16
+clusterSvcNets:
+  - 10.96.0.0/12
+
+# cniConfig:
+#   name: none
+
+nodes:
+  # Raspberry Pis
+  - hostname: c0-pi-a.${clusterDomainName}
+    ipAddress: 10.0.6.51
+    controlPlane: true
+    installDisk: /dev/mmcblk0
+    networkInterfaces:
+      - interface: eth0
+        addresses:
+          - 10.0.6.51/24
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 10.0.6.1
+        dhcp: false
+        vip:
+          ip: ${clusterEndpointIP}
+  - hostname: c0-pi-b.${clusterDomainName}
+    ipAddress: 10.0.6.52
+    controlPlane: true
+    installDisk: /dev/mmcblk0
+    networkInterfaces:
+      - interface: eth0
+        addresses:
+          - 10.0.6.52/24
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 10.0.6.1
+        dhcp: false
+        vip:
+          ip: ${clusterEndpointIP}
+    # Proxmox (aurora)
+  - hostname: c0-a.${clusterDomainName}
+    ipAddress: 10.0.6.61
+    controlPlane: true
+    installDisk: /dev/sda
+    networkInterfaces:
+      - interface: eth0
+        addresses:
+          - 10.0.6.61/24
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 10.0.6.1
+        dhcp: false
+        vip:
+          ip: ${clusterEndpointIP}
+  - hostname: c0-b.${clusterDomainName}
+    ipAddress: 10.0.6.62
+    installDisk: /dev/sda
+    networkInterfaces:
+      - interface: eth0
+        addresses:
+          - 10.0.6.62/24
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 10.0.6.1
+        dhcp: false
+  - hostname: c0-c.${clusterDomainName}
+    ipAddress: 10.0.6.63
+    installDisk: /dev/sda
+    networkInterfaces:
+      - interface: eth0
+        addresses:
+          - 10.0.6.63/24
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 10.0.6.1
+        dhcp: false
+
+controlPlane:
+  inlinePatch:
+    machine:
+      token: ${machineToken}
+      ca:
+        crt: ${machineCert}
+        key: ${machineCertKey}
+      kubelet:
+        extraArgs:
+          rotate-server-certificates: "true"
+          feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
+        nodeIP:
+          validSubnets:
+            - 10.0.6.0/24
+      files:
+        - content: |
+            [plugins."io.containerd.grpc.v1.cri"]
+              enable_unprivileged_ports = true
+              enable_unprivileged_icmp = true
+          path: /var/cri/conf.d/allow-unpriv-ports.toml
+          op: create
+      network:
+        extraHostEntries:
+          - aliases:
+              - ${clusterDomainName}
+            ip: ${clusterEndpointIP}
+      time:
+        disabled: false
+        servers:
+          - time.cloudflare.com
+    cluster:
+      secret: ${clusterSecret}
+      token: ${clusterToken}
+      secretboxEncryptionSecret: ${secretboxEncryptionSecret}
+      ca:
+        crt: ${clusterCert}
+        key: ${clusterCertKey}
+      aggregatorCA:
+        crt: ${k8sAggregatorCert}
+        key: ${k8sAggregatorCertKey}
+      serviceAccount:
+        key: ${k8sServiceAccountKey}
+      apiServer:
+        admissionControl: []
+        extraArgs:
+          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+      controllerManager:
+        extraArgs:
+          # bind-address: 0.0.0.0
+          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+      proxy:
+        # disabled: true
+        extraArgs:
+          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+      scheduler:
+        extraArgs:
+          # bind-address: 0.0.0.0
+          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+      discovery:
+        registries:
+          service:
+            disabled: true
+      etcd:
+        ca:
+          crt: ${etcdCert}
+          key: ${etcdCertKey}
+      extraManifests:
+        - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/v0.6.7/deploy/ha-install.yaml
+      allowSchedulingOnMasters: true
+worker:
+  inlinePatch:
+    machine:
+      token: ${machineToken}
+      ca:
+        crt: ${machineCert}
+        key: ${machineCertKey}
+      kubelet:
+        extraArgs:
+          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+          rotate-server-certificates: "true"
+      files:
+        - content: |
+            [plugins."io.containerd.grpc.v1.cri"]
+              enable_unprivileged_ports = true
+              enable_unprivileged_icmp = true
+          path: /var/cri/conf.d/allow-unpriv-ports.toml
+          op: create
+      network:
+        extraHostEntries:
+          - aliases:
+              - ${clusterDomainName}
+            ip: ${clusterEndpointIP}
+      time:
+        disabled: false
+        servers:
+          - time.cloudflare.com
+    cluster:
+      secret: ${clusterSecret}
+      token: ${clusterToken}
+      secretboxEncryptionSecret: ${secretboxEncryptionSecret}
+      ca:
+        crt: ${clusterCert}
+        key: ${clusterCertKey}
+      discovery:
+        registries:
+          service:
+            disabled: true

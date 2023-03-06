@@ -1,0 +1,10 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-settings
+  namespace: flux-system
+data:
+  TIMEZONE: "Europe/London"
+  CLUSTER_NAME: "homelab-cluster"
+  KUBE_VIP_ADDR: 10.0.6.100

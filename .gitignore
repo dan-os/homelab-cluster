@@ -1,0 +1,16 @@
+# Trash
+.DS_Store
+Thumbs.db
+# Binaries
+*.iso
+*.img
+# Secrets
+private/
+# Sops
+.decrypted~*
+*.agekey
+# Kubernetes
+kubeconfig*
+talosconfig*
+# Environment
+.env

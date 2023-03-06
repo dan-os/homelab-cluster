@@ -1,0 +1,10 @@
+# Used by Fluxv2 Source Controller
+# See https://toolkit.fluxcd.io/components/source/gitrepositories/#excluding-files
+
+# Exclude all by default
+
+/*
+
+# Include the following explicit folder(s)
+
+!/cluster
