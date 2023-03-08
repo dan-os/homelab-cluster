@@ -7,6 +7,8 @@ metadata:
 spec:
   ipAddressPools:
     - default-pool
+  dependsOn:
+    - metallb
 ---
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
@@ -16,3 +18,5 @@ metadata:
 spec:
   addresses:
     - "${METALLB_LB_RANGE}"
+  dependsOn:
+    - metallb
