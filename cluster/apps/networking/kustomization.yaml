@@ -4,5 +4,5 @@ kind: Kustomization
 resources:
   - namespace.yaml
   # - external-dns/ks.yaml
-  # - k8s-gateway/ks.yaml
+  - k8s-gateway/ks.yaml
   - metallb/ks.yaml
