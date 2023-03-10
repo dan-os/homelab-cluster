@@ -13,4 +13,4 @@ private/
 kubeconfig*
 talosconfig*
 # Environment
-.env
+*.env
