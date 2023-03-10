@@ -9,7 +9,9 @@ spec:
   path: ./cluster/apps
   prune: true
   dependsOn:
-    - name: core
+    - name: charts
+    - name: config
+    - name: crds
   sourceRef:
     kind: GitRepository
     name: flux-cluster
