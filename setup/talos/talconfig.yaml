@@ -1,8 +1,8 @@
 ---
 clusterName: homelab-cluster
 
-talosVersion: v1.3.5
-kubernetesVersion: v1.26.2
+talosVersion: v1.3.6
+kubernetesVersion: v1.26.3
 
 endpoint: https://${clusterEndpointIP}:6443
 domain: cluster.local
@@ -23,67 +23,104 @@ clusterSvcNets:
 
 nodes:
   # Raspberry Pis
-  - hostname: c0-pi-a.${clusterDomainName}
-    ipAddress: 10.0.6.51
+  - hostname: c0-pi-0.${clusterDomainName}
+    ipAddress: 10.0.6.70
     controlPlane: true
     installDisk: /dev/mmcblk0
     networkInterfaces:
       - interface: eth0
         addresses:
-          - 10.0.6.51/24
+          - 10.0.6.70/24
         routes:
           - network: 0.0.0.0/0
             gateway: 10.0.6.1
         dhcp: false
         vip:
           ip: ${clusterEndpointIP}
-  - hostname: c0-pi-b.${clusterDomainName}
-    ipAddress: 10.0.6.52
+  - hostname: c0-pi-1.${clusterDomainName}
+    ipAddress: 10.0.6.71
     controlPlane: true
     installDisk: /dev/mmcblk0
     networkInterfaces:
       - interface: eth0
         addresses:
-          - 10.0.6.52/24
+          - 10.0.6.71/24
         routes:
           - network: 0.0.0.0/0
             gateway: 10.0.6.1
         dhcp: false
         vip:
           ip: ${clusterEndpointIP}
-    # Proxmox (aurora)
-  - hostname: c0-a.${clusterDomainName}
-    ipAddress: 10.0.6.61
+    # VMs on "aurora"
+  - hostname: c0-aurora-0.${clusterDomainName}
+    ipAddress: 10.0.6.80
     controlPlane: true
     installDisk: /dev/sda
     networkInterfaces:
       - interface: eth0
         addresses:
-          - 10.0.6.61/24
+          - 10.0.6.80/24
         routes:
           - network: 0.0.0.0/0
             gateway: 10.0.6.1
         dhcp: false
         vip:
           ip: ${clusterEndpointIP}
-  - hostname: c0-b.${clusterDomainName}
-    ipAddress: 10.0.6.62
+  - hostname: c0-aurora-1.${clusterDomainName}
+    ipAddress: 10.0.6.81
     installDisk: /dev/sda
     networkInterfaces:
       - interface: eth0
         addresses:
-          - 10.0.6.62/24
+          - 10.0.6.81/24
         routes:
           - network: 0.0.0.0/0
             gateway: 10.0.6.1
         dhcp: false
-  - hostname: c0-c.${clusterDomainName}
-    ipAddress: 10.0.6.63
+  - hostname: c0-aurora-2.${clusterDomainName}
+    ipAddress: 10.0.6.82
     installDisk: /dev/sda
     networkInterfaces:
       - interface: eth0
         addresses:
-          - 10.0.6.63/24
+          - 10.0.6.82/24
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 10.0.6.1
+        dhcp: false
+    # VMs on "ares"
+  - hostname: c0-ares-0.${clusterDomainName}
+    ipAddress: 10.0.6.83
+    controlPlane: true
+    installDisk: /dev/sda
+    networkInterfaces:
+      - interface: eth0
+        addresses:
+          - 10.0.6.83/24
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 10.0.6.1
+        dhcp: false
+        vip:
+          ip: ${clusterEndpointIP}
+  - hostname: c0-ares-1.${clusterDomainName}
+    ipAddress: 10.0.6.84
+    installDisk: /dev/sda
+    networkInterfaces:
+      - interface: eth0
+        addresses:
+          - 10.0.6.84/24
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 10.0.6.1
+        dhcp: false
+  - hostname: c0-ares-2.${clusterDomainName}
+    ipAddress: 10.0.6.85
+    installDisk: /dev/sda
+    networkInterfaces:
+      - interface: eth0
+        addresses:
+          - 10.0.6.85/24
         routes:
           - network: 0.0.0.0/0
             gateway: 10.0.6.1
