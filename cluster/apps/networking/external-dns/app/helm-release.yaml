@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: external-dns
-      version: 1.12.1
+      version: 1.12.2
       sourceRef:
         kind: HelmRepository
         name: external-dns-charts
@@ -27,7 +27,7 @@ spec:
     keepHistory: false
   values:
     interval: 2m
-    logLevel: debug
+    logLevel: panic
     provider: cloudflare
     env:
       - name: CF_API_EMAIL
