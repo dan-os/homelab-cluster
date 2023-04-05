@@ -6,7 +6,7 @@ vars:
     sh: "git rev-parse --show-toplevel"
   CLUSTER_DIR: "{{.PROJECT_DIR}}/cluster"
 
-dotenv: [".config.env"]
+# dotenv: [".config.env"]
 
 env:
   KUBECONFIG: "{{.PROJECT_DIR}}/private/kubeconfig"
