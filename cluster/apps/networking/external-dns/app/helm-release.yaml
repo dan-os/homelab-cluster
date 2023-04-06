@@ -27,7 +27,7 @@ spec:
     keepHistory: false
   values:
     interval: 2m
-    logLevel: trace
+    logLevel: info
     provider: cloudflare
     env:
       - name: CF_API_TOKEN
@@ -35,16 +35,6 @@ spec:
           secretKeyRef:
             name: external-dns-secret
             key: token
-      # - name: CF_API_EMAIL
-      #   valueFrom:
-      #     secretKeyRef:
-      #       name: external-dns-secret
-      #       key: email
-      # - name: CF_API_KEY
-      #   valueFrom:
-      #     secretKeyRef:
-      #       name: external-dns-secret
-      #       key: api-key
     extraArgs:
       - --cloudflare-proxied
       - --annotation-filter=external-dns.alpha.kubernetes.io/target
