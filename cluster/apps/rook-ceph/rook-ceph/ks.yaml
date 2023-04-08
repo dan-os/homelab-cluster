@@ -26,7 +26,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: cluster-apps-rook-ceph
+    - name: apps-rook-ceph
   path: ./cluster/apps/rook-ceph/rook-ceph/cluster
   prune: true
   sourceRef:
