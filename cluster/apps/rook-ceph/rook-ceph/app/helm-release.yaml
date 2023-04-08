@@ -26,5 +26,7 @@ spec:
   uninstall:
     keepHistory: false
   values:
+    crds:
+      enabled: false
     monitoring:
       enabled: false
