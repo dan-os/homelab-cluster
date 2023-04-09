@@ -54,7 +54,7 @@ spec:
         provider: host
         connections:
           compression:
-            enabled: true
+            enabled: false
       crashCollector:
         disable: false
       dashboard:
