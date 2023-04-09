@@ -28,5 +28,5 @@ spec:
   values:
     crds:
       enabled: false
-    monitoring:
-      enabled: false
+    # monitoring:
+    #   enabled: false
