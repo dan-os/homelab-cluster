@@ -4,4 +4,4 @@ kind: Kustomization
 resources:
   - kube-system
   - networking
-  # - rook-ceph
+  - rook-ceph
