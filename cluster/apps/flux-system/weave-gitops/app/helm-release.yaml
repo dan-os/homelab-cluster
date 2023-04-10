@@ -29,7 +29,6 @@ spec:
     adminUser:
       create: true
       username: "admin"
-      createSecret: true
     ingress:
       enabled: true
       className: nginx
@@ -56,13 +55,13 @@ spec:
     #     - apiGroups: ["infra.contrib.fluxcd.io"]
     #       resources: ["terraforms"]
     #       verbs: ["get", "list", "patch"]
-  #   podAnnotations:
-  #     secret.reloader.stakater.com/reload: weave-gitops-secret
-  # valuesFrom:
-  #   - kind: Secret
-  #     name: weave-gitops-secret
-  #     valuesKey: adminPassword
-  #     targetPath: adminUser.passwordHash
+    podAnnotations:
+      secret.reloader.stakater.com/reload: weave-gitops-secret
+  valuesFrom:
+    - kind: Secret
+      name: weave-gitops-secret
+      valuesKey: adminPassword
+      targetPath: adminUser.passwordHash
   # - kind: Secret
   #   name: weave-gitops-secret
   #   valuesKey: WEAVEGITOPS_OAUTH_CLIENT_SECRET
