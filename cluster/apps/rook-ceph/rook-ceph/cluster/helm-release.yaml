@@ -5,7 +5,7 @@ metadata:
   name: rook-ceph-cluster
   namespace: rook-ceph
 spec:
-  interval: 15m
+  interval: 30m
   chart:
     spec:
       chart: rook-ceph-cluster
@@ -14,38 +14,12 @@ spec:
         kind: HelmRepository
         name: rook-ceph-charts
         namespace: flux-system
-  # maxHistory: 3
-  # install:
-  #   createNamespace: true
-  #   remediation:
-  #     retries: 3
-  # upgrade:
-  #   cleanupOnFail: true
-  #   remediation:
-  #     retries: 3
-  # uninstall:
-  #   keepHistory: false
   values:
+    toolbox:
+      enabled: true
     # monitoring:
     #   enabled: true
     #   createPrometheusRules: true
-    ingress:
-      dashboard:
-        ingressClassName: nginx
-        annotations:
-          nginx.ingress.kubernetes.io/whitelist-source-range: |
-            10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
-          nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-          hajimari.io/appName: "Rook"
-          hajimari.io/icon: mdi:chess-rook
-        host:
-          name: &host "rook.${SECRET_DOMAIN}"
-          path: /
-        tls:
-          - hosts:
-              - *host
-    toolbox:
-      enabled: true
     configOverride: |
       [global]
       bdev_enable_discard = true
@@ -96,33 +70,44 @@ spec:
             memory: "100M"
           limits:
             memory: "1G"
-        # connections:
-        #   compression:
-        #     enabled: false
       crashCollector:
         disable: false
       dashboard:
         enabled: true
         urlPrefix: /
-        # ssl: false
       storage:
         useAllNodes: false
         useAllDevices: false
         config:
           osdsPerDevice: "1"
         nodes:
-          - name: c0-aurora-0
+          - name: "c0-aurora-0"
             devices:
-              - name: /dev/disk/by-id/wwn-0x6c81f660ecb783002bc470f922f352f4
-          # - name: c0-aurora-1
+              - name: "/dev/disk/by-id/wwn-0x6c81f660ecb783002bc470f922f352f4"
+          # - name: "c0-aurora-1"
           #   devices:
-          #     - name: /dev/disk/by-id/wwn-0x6c81f660ecb783002bc4711524a168e5
-          - name: c0-ares-0
+          #     - name: "/dev/disk/by-id/wwn-0x6c81f660ecb783002bc4711524a168e5"
+          - name: "c0-ares-0"
             devices:
-              - name: /dev/disk/by-id/wwn-0x55cd2e414e04bf67
-          - name: c0-ares-1
+              - name: "/dev/disk/by-id/wwn-0x55cd2e414e04bf67"
+          - name: "c0-ares-1"
             devices:
-              - name: /dev/disk/by-id/wwn-0x55cd2e414e04beca
+              - name: "/dev/disk/by-id/wwn-0x55cd2e414e04beca"
+    ingress:
+      ingressClassName: nginx
+      dashboard:
+        annotations:
+          nginx.ingress.kubernetes.io/whitelist-source-range: |
+            10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+          nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+          hajimari.io/appName: "Rook"
+          hajimari.io/icon: mdi:chess-rook
+        host:
+          name: &host "rook.${SECRET_DOMAIN}"
+          path: /
+        tls:
+          - hosts:
+              - *host
     cephBlockPoolsVolumeSnapshotClass:
       enabled: false
     cephBlockPools:
