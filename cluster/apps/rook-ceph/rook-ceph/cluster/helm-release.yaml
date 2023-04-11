@@ -53,6 +53,49 @@ spec:
     cephClusterSpec:
       network:
         provider: host
+      resources:
+        mgr:
+          requests:
+            cpu: "125m"
+            memory: "549M"
+          limits:
+            memory: "1219M"
+        mon:
+          requests:
+            cpu: "49m"
+            memory: "477M"
+          limits:
+            memory: "1059M"
+        osd:
+          requests:
+            cpu: "442m"
+            memory: "2678M"
+          limits:
+            memory: "5944M"
+        mgr-sidecar:
+          requests:
+            cpu: "49m"
+            memory: "94M"
+          limits:
+            memory: "208M"
+        crashcollector:
+          requests:
+            cpu: "15m"
+            memory: "64M"
+          limits:
+            memory: "64M"
+        logcollector:
+          requests:
+            cpu: "100m"
+            memory: "100M"
+          limits:
+            memory: "1G"
+        cleanup:
+          requests:
+            cpu: "250m"
+            memory: "100M"
+          limits:
+            memory: "1G"
         # connections:
         #   compression:
         #     enabled: false
@@ -71,9 +114,9 @@ spec:
           - name: c0-aurora-0
             devices:
               - name: /dev/disk/by-id/wwn-0x6c81f660ecb783002bc470f922f352f4
-          - name: c0-aurora-1
-            devices:
-              - name: /dev/disk/by-id/wwn-0x6c81f660ecb783002bc4711524a168e5
+          # - name: c0-aurora-1
+          #   devices:
+          #     - name: /dev/disk/by-id/wwn-0x6c81f660ecb783002bc4711524a168e5
           - name: c0-ares-0
             devices:
               - name: /dev/disk/by-id/wwn-0x55cd2e414e04bf67
@@ -114,21 +157,19 @@ spec:
             - failureDomain: host
               replicated:
                 size: 3
-              name: data0
           metadataServer:
             activeCount: 1
             activeStandby: true
-            # resources:
-            #   requests:
-            #     cpu: 1000m
-            #     memory: 4Gi
-            #   limits:
-            #     memory: 4Gi
+            resources:
+              requests:
+                cpu: "35m"
+                memory: "64M"
+              limits:
+                memory: "144M"
         storageClass:
           enabled: true
           isDefault: false
           name: ceph-filesystem
-          pool: data0
           reclaimPolicy: Delete
           allowVolumeExpansion: true
           mountOptions: []
@@ -155,12 +196,12 @@ spec:
           preservePoolsOnDelete: true
           gateway:
             port: 80
-            # resources:
-            #   requests:
-            #     cpu: 1000m
-            #     memory: 1Gi
-            #   limits:
-            #     memory: 2Gi
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128M
+              limits:
+                memory: 2Gi
             instances: 1
           healthCheck:
             bucket:
