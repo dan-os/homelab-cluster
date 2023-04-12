@@ -16,7 +16,7 @@ spec:
         namespace: flux-system
   values:
     toolbox:
-      enabled: true
+      enabled: false
     # monitoring:
     #   enabled: true
     #   createPrometheusRules: true
@@ -94,17 +94,14 @@ spec:
             devices:
               - name: "sdb" # "/dev/disk/by-id/wwn-0x55cd2e414e04beca" (QEMU_HARDDISK_drive-scsi2)
     ingress:
-      ingressClassName: nginx
+      ingressClassName: "nginx"
       dashboard:
         annotations:
-          nginx.ingress.kubernetes.io/whitelist-source-range: |
-            10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+          nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
           nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-          hajimari.io/appName: "Rook"
-          hajimari.io/icon: mdi:chess-rook
         host:
           name: &host "rook.${SECRET_DOMAIN}"
-          path: /
+          path: "/"
         tls:
           - hosts:
               - *host
