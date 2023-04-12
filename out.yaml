@@ -1,0 +1,407 @@
+Name:             rook-ceph-rgw-ceph-objectstore-a-85bb4df497-npvs8
+Namespace:        rook-ceph
+Priority:         0
+Service Account:  rook-ceph-rgw
+Node:             c0-ares-2/10.0.6.85
+Start Time:       Wed, 12 Apr 2023 22:14:55 +0100
+Labels:           app=rook-ceph-rgw
+                  app.kubernetes.io/component=cephobjectstores.ceph.rook.io
+                  app.kubernetes.io/created-by=rook-ceph-operator
+                  app.kubernetes.io/instance=ceph-objectstore
+                  app.kubernetes.io/managed-by=rook-ceph-operator
+                  app.kubernetes.io/name=ceph-rgw
+                  app.kubernetes.io/part-of=ceph-objectstore
+                  ceph_daemon_id=ceph-objectstore
+                  ceph_daemon_type=rgw
+                  pod-template-hash=85bb4df497
+                  rgw=ceph-objectstore
+                  rook.io/operator-namespace=rook-ceph
+                  rook_cluster=rook-ceph
+                  rook_object_store=ceph-objectstore
+Annotations:      <none>
+Status:           Running
+IP:               10.0.6.85
+IPs:
+  IP:           10.0.6.85
+Controlled By:  ReplicaSet/rook-ceph-rgw-ceph-objectstore-a-85bb4df497
+Init Containers:
+  chown-container-data-dir:
+    Container ID:  containerd://9d38ce4c4beb1c2efc73fb31021f7f8772a19937b4b42df3cb703de9018f88d4
+    Image:         quay.io/ceph/ceph:v17.2.5
+    Image ID:      quay.io/ceph/ceph@sha256:34c763383e3323c6bb35f3f2229af9f466518d9db926111277f5e27ed543c427
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      chown
+    Args:
+      --verbose
+      --recursive
+      ceph:ceph
+      /var/log/ceph
+      /var/lib/ceph/crash
+      /run/ceph
+      /var/lib/ceph/rgw/ceph-ceph-objectstore
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Wed, 12 Apr 2023 22:14:56 +0100
+      Finished:     Wed, 12 Apr 2023 22:14:56 +0100
+    Ready:          True
+    Restart Count:  0
+    Limits:
+      memory:  2Gi
+    Requests:
+      cpu:        100m
+      memory:     128M
+    Environment:  <none>
+    Mounts:
+      /etc/ceph from rook-config-override (ro)
+      /etc/ceph/keyring-store/ from rook-ceph-rgw-ceph-objectstore-a-keyring (ro)
+      /run/ceph from ceph-daemons-sock-dir (rw)
+      /var/lib/ceph/crash from rook-ceph-crash (rw)
+      /var/lib/ceph/rgw/ceph-ceph-objectstore from ceph-daemon-data (rw)
+      /var/log/ceph from rook-ceph-log (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-2jtkl (ro)
+Containers:
+  rgw:
+    Container ID:  containerd://17fe8db624f54a90fd34e349bbe518f7b8fa999bd248f7534d4c87c794b62b98
+    Image:         quay.io/ceph/ceph:v17.2.5
+    Image ID:      quay.io/ceph/ceph@sha256:34c763383e3323c6bb35f3f2229af9f466518d9db926111277f5e27ed543c427
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      radosgw
+    Args:
+      --fsid=0cb32877-d34f-4970-ab85-ee631d1bc1f1
+      --keyring=/etc/ceph/keyring-store/keyring
+      --log-to-stderr=true
+      --err-to-stderr=true
+      --mon-cluster-log-to-stderr=true
+      --log-stderr-prefix=debug 
+      --default-log-to-file=false
+      --default-mon-cluster-log-to-file=false
+      --mon-host=$(ROOK_CEPH_MON_HOST)
+      --mon-initial-members=$(ROOK_CEPH_MON_INITIAL_MEMBERS)
+      --id=rgw.ceph.objectstore.a
+      --setuser=ceph
+      --setgroup=ceph
+      --foreground
+      --rgw-frontends=beast port=80
+      --host=$(POD_NAME)
+      --rgw-mime-types-file=/etc/ceph/rgw/mime.types
+      --rgw-realm=ceph-objectstore
+      --rgw-zonegroup=ceph-objectstore
+      --rgw-zone=ceph-objectstore
+    State:          Waiting
+      Reason:       CrashLoopBackOff
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    1
+      Started:      Wed, 12 Apr 2023 23:03:46 +0100
+      Finished:     Wed, 12 Apr 2023 23:08:46 +0100
+    Ready:          False
+    Restart Count:  12
+    Limits:
+      memory:  2Gi
+    Requests:
+      cpu:      100m
+      memory:   128M
+    Readiness:  exec [bash -c #!/usr/bin/env bash
+
+PROBE_TYPE="readiness"
+PROBE_PORT="80"
+PROBE_PROTOCOL="HTTP"
+
+# standard bash codes start at 126 and progress upward. pick error codes from 125 downward for
+# script as to allow curl to output new error codes and still return a distinctive number.
+USAGE_ERR_CODE=125
+PROBE_ERR_CODE=124
+# curl error codes: 1-123
+
+STARTUP_TYPE='startup'
+READINESS_TYPE='readiness'
+
+RGW_URL="$PROBE_PROTOCOL://0.0.0.0:$PROBE_PORT"
+
+function check() {
+  local URL="$1"
+  # --insecure - don't validate ssl if using secure port only
+  # --silent - don't output progress info
+  # --output /dev/stderr - output HTML header to stdout (good for debugging)
+  # --write-out '%{response_code}' - print the HTTP response code to stdout
+  curl --insecure --silent --output /dev/stderr --write-out '%{response_code}' "$URL"
+}
+
+http_response="$(check "$RGW_URL")"
+retcode=$?
+
+if [[ $retcode -ne 0 ]]; then
+  # if this is the startup probe, always returning failure. if startup probe passes, all subsequent
+  # probes can rely on the assumption that the health check was once succeeding without errors.
+  # if this is the readiness probe, we know that curl was previously working correctly in the
+  # startup probe, so curl error most likely means some new error with the RGW.
+  echo "RGW health check failed with error code: $retcode. the RGW likely cannot be reached by clients" >/dev/stderr
+  exit $retcode
+fi
+
+RGW_RATE_LIMITING_RESPONSE=503
+RGW_MISCONFIGURATION_RESPONSE=500
+
+if [[ $http_response -ge 200 ]] && [[ $http_response -lt 400 ]]; then
+  # 200-399 are successful responses. same behavior as Kubernetes' HTTP probe
+  exit 0
+
+elif [[ $http_response -eq $RGW_RATE_LIMITING_RESPONSE ]]; then
+  # S3's '503: slow down' code is not an error but an indication that RGW is throttling client
+  # traffic. failing the readiness check here would only cause an increase in client connections on
+  # other RGWs and likely cause those to fail also in a cascade. i.e., a special healthy response.
+  echo "INFO: RGW is rate limiting" 2>/dev/stderr
+  exit 0
+
+elif [[ $http_response -eq $RGW_MISCONFIGURATION_RESPONSE ]]; then
+  # can't specifically determine if the RGW is running or not. most likely a misconfiguration.
+  case "$PROBE_TYPE" in
+  "$STARTUP_TYPE")
+    # fail until we can accurately get a valid healthy response when runtime starts.
+    echo 'FAIL: HTTP code 500 suggests an RGW misconfiguration.' >/dev/stderr
+    exit $PROBE_ERR_CODE
+    ;;
+  "$READINESS_TYPE")
+    # config likely modified at runtime which could result in all RGWs failing this check.
+    # occasional client failures are still better than total failure, so ignore this
+    echo 'WARN: HTTP code 500 suggests an RGW misconfiguration' >/dev/stderr
+    exit 0
+    ;;
+  *)
+    # prior arg validation means this path should never be activated, but keep to be safe
+    echo "ERROR: probe type is unknown: $PROBE_TYPE" >/dev/stderr
+    exit $USAGE_ERR_CODE
+    ;;
+  esac
+
+else
+  # anything else is a failing response. same behavior as Kubernetes' HTTP probe
+  echo "FAIL: received an HTTP error code: $http_response"
+  exit $PROBE_ERR_CODE
+
+fi
+] delay=10s timeout=5s period=10s #success=3 #failure=3
+    Startup:  exec [bash -c #!/usr/bin/env bash
+
+PROBE_TYPE="startup"
+PROBE_PORT="80"
+PROBE_PROTOCOL="HTTP"
+
+# standard bash codes start at 126 and progress upward. pick error codes from 125 downward for
+# script as to allow curl to output new error codes and still return a distinctive number.
+USAGE_ERR_CODE=125
+PROBE_ERR_CODE=124
+# curl error codes: 1-123
+
+STARTUP_TYPE='startup'
+READINESS_TYPE='readiness'
+
+RGW_URL="$PROBE_PROTOCOL://0.0.0.0:$PROBE_PORT"
+
+function check() {
+  local URL="$1"
+  # --insecure - don't validate ssl if using secure port only
+  # --silent - don't output progress info
+  # --output /dev/stderr - output HTML header to stdout (good for debugging)
+  # --write-out '%{response_code}' - print the HTTP response code to stdout
+  curl --insecure --silent --output /dev/stderr --write-out '%{response_code}' "$URL"
+}
+
+http_response="$(check "$RGW_URL")"
+retcode=$?
+
+if [[ $retcode -ne 0 ]]; then
+  # if this is the startup probe, always returning failure. if startup probe passes, all subsequent
+  # probes can rely on the assumption that the health check was once succeeding without errors.
+  # if this is the readiness probe, we know that curl was previously working correctly in the
+  # startup probe, so curl error most likely means some new error with the RGW.
+  echo "RGW health check failed with error code: $retcode. the RGW likely cannot be reached by clients" >/dev/stderr
+  exit $retcode
+fi
+
+RGW_RATE_LIMITING_RESPONSE=503
+RGW_MISCONFIGURATION_RESPONSE=500
+
+if [[ $http_response -ge 200 ]] && [[ $http_response -lt 400 ]]; then
+  # 200-399 are successful responses. same behavior as Kubernetes' HTTP probe
+  exit 0
+
+elif [[ $http_response -eq $RGW_RATE_LIMITING_RESPONSE ]]; then
+  # S3's '503: slow down' code is not an error but an indication that RGW is throttling client
+  # traffic. failing the readiness check here would only cause an increase in client connections on
+  # other RGWs and likely cause those to fail also in a cascade. i.e., a special healthy response.
+  echo "INFO: RGW is rate limiting" 2>/dev/stderr
+  exit 0
+
+elif [[ $http_response -eq $RGW_MISCONFIGURATION_RESPONSE ]]; then
+  # can't specifically determine if the RGW is running or not. most likely a misconfiguration.
+  case "$PROBE_TYPE" in
+  "$STARTUP_TYPE")
+    # fail until we can accurately get a valid healthy response when runtime starts.
+    echo 'FAIL: HTTP code 500 suggests an RGW misconfiguration.' >/dev/stderr
+    exit $PROBE_ERR_CODE
+    ;;
+  "$READINESS_TYPE")
+    # config likely modified at runtime which could result in all RGWs failing this check.
+    # occasional client failures are still better than total failure, so ignore this
+    echo 'WARN: HTTP code 500 suggests an RGW misconfiguration' >/dev/stderr
+    exit 0
+    ;;
+  *)
+    # prior arg validation means this path should never be activated, but keep to be safe
+    echo "ERROR: probe type is unknown: $PROBE_TYPE" >/dev/stderr
+    exit $USAGE_ERR_CODE
+    ;;
+  esac
+
+else
+  # anything else is a failing response. same behavior as Kubernetes' HTTP probe
+  echo "FAIL: received an HTTP error code: $http_response"
+  exit $PROBE_ERR_CODE
+
+fi
+] delay=10s timeout=5s period=10s #success=1 #failure=33
+    Environment:
+      CONTAINER_IMAGE:                quay.io/ceph/ceph:v17.2.5
+      POD_NAME:                       rook-ceph-rgw-ceph-objectstore-a-85bb4df497-npvs8 (v1:metadata.name)
+      POD_NAMESPACE:                  rook-ceph (v1:metadata.namespace)
+      NODE_NAME:                       (v1:spec.nodeName)
+      POD_MEMORY_LIMIT:               2147483648 (limits.memory)
+      POD_MEMORY_REQUEST:             128000000 (requests.memory)
+      POD_CPU_LIMIT:                  node allocatable (limits.cpu)
+      POD_CPU_REQUEST:                1 (requests.cpu)
+      CEPH_USE_RANDOM_NONCE:          true
+      ROOK_CEPH_MON_HOST:             <set to the key 'mon_host' in secret 'rook-ceph-config'>             Optional: false
+      ROOK_CEPH_MON_INITIAL_MEMBERS:  <set to the key 'mon_initial_members' in secret 'rook-ceph-config'>  Optional: false
+    Mounts:
+      /etc/ceph from rook-config-override (ro)
+      /etc/ceph/keyring-store/ from rook-ceph-rgw-ceph-objectstore-a-keyring (ro)
+      /etc/ceph/rgw from rook-ceph-rgw-ceph-objectstore-mime-types (ro)
+      /run/ceph from ceph-daemons-sock-dir (rw)
+      /var/lib/ceph/crash from rook-ceph-crash (rw)
+      /var/lib/ceph/rgw/ceph-ceph-objectstore from ceph-daemon-data (rw)
+      /var/log/ceph from rook-ceph-log (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-2jtkl (ro)
+  log-collector:
+    Container ID:  containerd://018369fc6439e449230d215a52f5c66afd3b15738193a125e2bea3bc375636d8
+    Image:         quay.io/ceph/ceph:v17.2.5
+    Image ID:      quay.io/ceph/ceph@sha256:34c763383e3323c6bb35f3f2229af9f466518d9db926111277f5e27ed543c427
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      /bin/bash
+      -x
+      -e
+      -m
+      -c
+      
+      CEPH_CLIENT_ID=ceph-client.rgw.ceph.objectstore.a
+      PERIODICITY=daily
+      LOG_ROTATE_CEPH_FILE=/etc/logrotate.d/ceph
+      LOG_MAX_SIZE=500M
+      ROTATE=7
+      
+      # edit the logrotate file to only rotate a specific daemon log
+      # otherwise we will logrotate log files without reloading certain daemons
+      # this might happen when multiple daemons run on the same machine
+      sed -i "s|*.log|$CEPH_CLIENT_ID.log|" "$LOG_ROTATE_CEPH_FILE"
+      
+      # replace default daily with given user input
+      sed --in-place "s/daily/$PERIODICITY/g" "$LOG_ROTATE_CEPH_FILE"
+      
+      # replace rotate count, default 7 for all ceph daemons other than rbd-mirror
+      sed --in-place "s/rotate 7/rotate $ROTATE/g" "$LOG_ROTATE_CEPH_FILE"
+      
+      if [ "$LOG_MAX_SIZE" != "0" ]; then
+        # adding maxsize $LOG_MAX_SIZE at the 4th line of the logrotate config file with 4 spaces to maintain indentation
+        sed --in-place "4i \ \ \ \ maxsize $LOG_MAX_SIZE" "$LOG_ROTATE_CEPH_FILE"
+      fi
+      
+      while true; do
+        # we don't force the logrorate but we let the logrotate binary handle the rotation based on user's input for periodicity and size
+        logrotate --verbose "$LOG_ROTATE_CEPH_FILE"
+        sleep 15m
+      done
+      
+    State:          Running
+      Started:      Wed, 12 Apr 2023 22:14:56 +0100
+    Ready:          True
+    Restart Count:  0
+    Limits:
+      cpu:     500m
+      memory:  1G
+    Requests:
+      cpu:        100m
+      memory:     100M
+    Environment:  <none>
+    Mounts:
+      /etc/ceph from rook-config-override (ro)
+      /run/ceph from ceph-daemons-sock-dir (rw)
+      /var/lib/ceph/crash from rook-ceph-crash (rw)
+      /var/log/ceph from rook-ceph-log (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-2jtkl (ro)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             False 
+  ContainersReady   False 
+  PodScheduled      True 
+Volumes:
+  rook-config-override:
+    Type:               Projected (a volume that contains injected data from multiple sources)
+    ConfigMapName:      rook-config-override
+    ConfigMapOptional:  <nil>
+  rook-ceph-rgw-ceph-objectstore-a-keyring:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  rook-ceph-rgw-ceph-objectstore-a-keyring
+    Optional:    false
+  ceph-daemons-sock-dir:
+    Type:          HostPath (bare host directory volume)
+    Path:          /var/lib/rook/exporter
+    HostPathType:  DirectoryOrCreate
+  rook-ceph-log:
+    Type:          HostPath (bare host directory volume)
+    Path:          /var/lib/rook/rook-ceph/log
+    HostPathType:  
+  rook-ceph-crash:
+    Type:          HostPath (bare host directory volume)
+    Path:          /var/lib/rook/rook-ceph/crash
+    HostPathType:  
+  ceph-daemon-data:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     
+    SizeLimit:  <unset>
+  rook-ceph-rgw-ceph-objectstore-mime-types:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      rook-ceph-rgw-ceph-objectstore-mime-types
+    Optional:  false
+  kube-api-access-2jtkl:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 5s
+Events:
+  Type     Reason     Age                   From               Message
+  ----     ------     ----                  ----               -------
+  Normal   Scheduled  54m                   default-scheduler  Successfully assigned rook-ceph/rook-ceph-rgw-ceph-objectstore-a-85bb4df497-npvs8 to c0-ares-2
+  Normal   Pulled     54m                   kubelet            Container image "quay.io/ceph/ceph:v17.2.5" already present on machine
+  Normal   Created    54m                   kubelet            Created container chown-container-data-dir
+  Normal   Started    54m                   kubelet            Started container chown-container-data-dir
+  Normal   Created    54m                   kubelet            Created container rgw
+  Normal   Started    54m                   kubelet            Started container rgw
+  Normal   Pulled     54m                   kubelet            Container image "quay.io/ceph/ceph:v17.2.5" already present on machine
+  Normal   Created    54m                   kubelet            Created container log-collector
+  Normal   Started    54m                   kubelet            Started container log-collector
+  Normal   Pulled     49m (x2 over 54m)     kubelet            Container image "quay.io/ceph/ceph:v17.2.5" already present on machine
+  Warning  BackOff    9m6s (x55 over 43m)   kubelet            Back-off restarting failed container rgw in pod rook-ceph-rgw-ceph-objectstore-a-85bb4df497-npvs8_rook-ceph(200d2348-b0b2-4d71-8ff8-8d0599e1a3a1)
+  Warning  Unhealthy  4m1s (x205 over 53m)  kubelet            Startup probe failed: RGW health check failed with error code: 7. the RGW likely cannot be reached by clients
