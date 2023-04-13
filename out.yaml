@@ -1,0 +1,132 @@
+Name:             rook-ceph-osd-prepare-c0-ares-0
+Namespace:        rook-ceph
+Selector:         controller-uid=cc898ae1-648d-4f82-bf71-5b8404d49630
+Labels:           app=rook-ceph-osd-prepare
+                  ceph-version=17.2.5-0
+                  rook-version=v1.11.3
+                  rook_cluster=rook-ceph
+Annotations:      batch.kubernetes.io/job-tracking: 
+Controlled By:    CephCluster/rook-ceph
+Parallelism:      1
+Completions:      1
+Completion Mode:  NonIndexed
+Start Time:       Thu, 13 Apr 2023 14:24:47 +0100
+Completed At:     Thu, 13 Apr 2023 14:24:56 +0100
+Duration:         9s
+Pods Statuses:    0 Active (0 Ready) / 1 Succeeded / 0 Failed
+Pod Template:
+  Labels:           app=rook-ceph-osd-prepare
+                    ceph.rook.io/pvc=
+                    controller-uid=cc898ae1-648d-4f82-bf71-5b8404d49630
+                    job-name=rook-ceph-osd-prepare-c0-ares-0
+                    rook_cluster=rook-ceph
+  Service Account:  rook-ceph-osd
+  Init Containers:
+   copy-bins:
+    Image:      rook/ceph:v1.11.3
+    Port:       <none>
+    Host Port:  <none>
+    Args:
+      copy-binaries
+      --copy-to-dir
+      /rook
+    Requests:
+      cpu:        500m
+      memory:     50Mi
+    Environment:  <none>
+    Mounts:
+      /rook from rook-binaries (rw)
+  Containers:
+   provision:
+    Image:      quay.io/ceph/ceph:v17.2.5
+    Port:       <none>
+    Host Port:  <none>
+    Command:
+      /rook/rook
+    Args:
+      ceph
+      osd
+      provision
+    Requests:
+      cpu:     500m
+      memory:  50Mi
+    Environment Variables from:
+      rook-ceph-osd-env-override  ConfigMap  Optional: true
+    Environment:
+      ROOK_NODE_NAME:                 c0-ares-0
+      ROOK_CLUSTER_ID:                5db4194b-a689-41f1-8e9d-8979ae0714e1
+      ROOK_CLUSTER_NAME:              rook-ceph
+      ROOK_PRIVATE_IP:                 (v1:status.podIP)
+      ROOK_PUBLIC_IP:                  (v1:status.podIP)
+      POD_NAMESPACE:                  rook-ceph
+      ROOK_MON_ENDPOINTS:             <set to the key 'data' of config map 'rook-ceph-mon-endpoints'>  Optional: false
+      ROOK_CONFIG_DIR:                /var/lib/rook
+      ROOK_CEPH_CONFIG_OVERRIDE:      /etc/rook/config/override.conf
+      NODE_NAME:                       (v1:spec.nodeName)
+      ROOK_CRUSHMAP_ROOT:             default
+      ROOK_CEPH_USERNAME:             <set to the key 'ceph-username' in secret 'rook-ceph-mon'>  Optional: false
+      ROOK_FSID:                      <set to the key 'fsid' in secret 'rook-ceph-mon'>           Optional: false
+      ROOK_CRUSHMAP_HOSTNAME:         c0-ares-0
+      CEPH_VOLUME_DEBUG:              1
+      CEPH_VOLUME_SKIP_RESTORECON:    1
+      DM_DISABLE_UDEV:                1
+      ROOK_OSDS_PER_DEVICE:           1
+      ROOK_LOG_LEVEL:                 DEBUG
+      ROOK_DATA_DEVICES:              [{"id":"sdb","storeConfig":{"osdsPerDevice":1}}]
+      ROOK_CEPH_VERSION:              ceph version 17.2.5-0 quincy
+      ROOK_OSD_CRUSH_DEVICE_CLASS:    
+      ROOK_OSD_CRUSH_INITIAL_WEIGHT:  
+    Mounts:
+      /dev from devices (rw)
+      /etc/ceph from ceph-conf-emptydir (rw)
+      /rook from rook-binaries (rw)
+      /rootfs from rootfs (ro)
+      /run/ceph from ceph-daemons-sock-dir (rw)
+      /run/udev from udev (rw)
+      /var/lib/ceph/crash from rook-ceph-crash (rw)
+      /var/lib/rook from rook-data (rw)
+      /var/lib/rook-ceph-mon from ceph-admin-secret (ro)
+      /var/log/ceph from rook-ceph-log (rw)
+  Volumes:
+   rook-data:
+    Type:          HostPath (bare host directory volume)
+    Path:          /var/lib/rook
+    HostPathType:  
+   ceph-conf-emptydir:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     
+    SizeLimit:  <unset>
+   ceph-daemons-sock-dir:
+    Type:          HostPath (bare host directory volume)
+    Path:          /var/lib/rook/exporter
+    HostPathType:  DirectoryOrCreate
+   rook-ceph-log:
+    Type:          HostPath (bare host directory volume)
+    Path:          /var/lib/rook/rook-ceph/log
+    HostPathType:  
+   rook-ceph-crash:
+    Type:          HostPath (bare host directory volume)
+    Path:          /var/lib/rook/rook-ceph/crash
+    HostPathType:  
+   rook-binaries:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     
+    SizeLimit:  <unset>
+   udev:
+    Type:          HostPath (bare host directory volume)
+    Path:          /run/udev
+    HostPathType:  
+   devices:
+    Type:          HostPath (bare host directory volume)
+    Path:          /dev
+    HostPathType:  
+   ceph-admin-secret:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  rook-ceph-mon
+    Optional:    false
+   rootfs:
+    Type:               HostPath (bare host directory volume)
+    Path:               /
+    HostPathType:       
+  Priority Class Name:  system-node-critical
+Events:                 <none>

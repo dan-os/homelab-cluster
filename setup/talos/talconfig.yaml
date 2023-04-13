@@ -18,8 +18,8 @@ clusterPodNets:
 clusterSvcNets:
   - 10.96.0.0/12
 
-# cniConfig:
-#   name: none
+cniConfig:
+  name: none
 
 nodes:
   # Raspberry Pis
@@ -137,9 +137,9 @@ controlPlane:
         extraArgs:
           rotate-server-certificates: "true"
           feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
-        nodeIP:
-          validSubnets:
-            - 10.0.6.0/24
+        # nodeIP:
+        #   validSubnets:
+        #     - 10.0.6.0/24
       files:
         - content: |
             [plugins."io.containerd.grpc.v1.cri"]
@@ -147,6 +147,9 @@ controlPlane:
               enable_unprivileged_icmp = true
           path: /var/cri/conf.d/allow-unpriv-ports.toml
           op: create
+      sysctls:
+        fs.inotify.max_user_instances: "8192"
+        fs.inotify.max_user_watches: "1048576"
       network:
         extraHostEntries:
           - aliases:
@@ -213,6 +216,9 @@ worker:
               enable_unprivileged_icmp = true
           path: /var/cri/conf.d/allow-unpriv-ports.toml
           op: create
+      sysctls:
+        fs.inotify.max_user_instances: "8192"
+        fs.inotify.max_user_watches: "1048576"
       network:
         extraHostEntries:
           - aliases:
