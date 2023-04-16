@@ -31,9 +31,11 @@ spec:
         - name: TZ
           value: "${TIMEZONE}"
       service:
-        annotations:
-          io.cilium/lb-ipam-ips: "${METALLB_INGRESS_ADDR}"
-          # metallb.universe.tf/loadBalancerIPs: "${METALLB_INGRESS_ADDR}"
+        enabled: true
+        type: LoadBalancer
+        loadBalancerIP: "${METALLB_INGRESS_ADDR}"
+        # annotations:
+        #   metallb.universe.tf/loadBalancerIPs: "${METALLB_INGRESS_ADDR}"
         externalTrafficPolicy: Local
       publishService:
         enabled: true
