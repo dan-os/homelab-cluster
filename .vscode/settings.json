@@ -2,6 +2,11 @@
   "files.associations": {
     // "*.json5": "jsonc",
   },
+  "prettier.configPath": ".ci/prettier/.prettierrc.yaml",
+  "prettier.ignorePath": ".ci/prettier/.prettierignore",
+  "yaml.schemas": {
+    "kubernetes": ["cluster/*.yml", "cluster/*.yaml"]
+  },
   "editor.bracketPairColorization.enabled": true,
   "editor.guides.bracketPairs": true,
   "editor.guides.bracketPairsHorizontal": true,

@@ -4,13 +4,13 @@ Thumbs.db
 # Binaries
 *.iso
 *.img
-# Secrets
-private/
 # Sops
-.decrypted~*
 *.agekey
+.decrypted~*
 # Kubernetes
 kubeconfig*
 talosconfig*
 # Environment
 *.env
+# Folders
+private/
