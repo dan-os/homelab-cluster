@@ -1,0 +1,2 @@
+# Cilium must be manually installed before bootstrapping
+cilium.yaml
