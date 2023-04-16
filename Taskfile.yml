@@ -15,6 +15,7 @@ env:
 includes:
   cluster: .taskfiles/ClusterTasks.yml
   precommit: .taskfiles/PrecommitTasks.yml
+  talos: .taskfiles/TalosTasks.yml
 
 tasks:
   default:

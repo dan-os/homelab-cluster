@@ -1,0 +1,8 @@
+---
+version: "3"
+
+tasks:
+  nuke:
+    desc: Nuke the TalOS machines
+    cmds:
+      - talosctl reset --reboot --graceful=false --nodes 10.0.6.80,10.0.6.81,10.0.6.82,10.0.6.83,10.0.6.84,10.0.6.85
