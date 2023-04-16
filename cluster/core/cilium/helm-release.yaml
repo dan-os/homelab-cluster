@@ -17,10 +17,10 @@ spec:
   interval: 30m
   values:
     autoDirectNodeRoutes: true
-    bgp:
-      announce:
-        loadbalancerIP: true
-      enabled: true
+    # bgp:
+    #   announce:
+    #     loadbalancerIP: true
+    #   enabled: true
     cluster:
       id: 0
       name: ${CLUSTER_NAME}
@@ -60,7 +60,7 @@ spec:
     ipam:
       mode: kubernetes
     ipv4NativeRoutingCIDR: 10.244.0.0/16
-    k8sServiceHost: cluster-0.bjw-s.tech
+    k8sServiceHost: "${CLUSTER_NAME}.${SECRET_DOMAIN}"
     k8sServicePort: 6443
     kubeProxyReplacement: strict
     kubeProxyReplacementHealthzBindAddr: 0.0.0.0:10256
