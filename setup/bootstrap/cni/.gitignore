@@ -1,0 +1,3 @@
+# Cilium must be manually installed before bootstrapping
+# (kubectl kustomize --enable-helm > install.yaml)
+install.yaml
