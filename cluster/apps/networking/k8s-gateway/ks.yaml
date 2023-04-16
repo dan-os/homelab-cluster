@@ -5,9 +5,9 @@ metadata:
   name: apps-k8s-gateway
   namespace: flux-system
 spec:
-  dependsOn:
-    - name: apps-metallb
-    - name: apps-metallb-config
+  # dependsOn:
+  #   - name: apps-metallb
+  #   - name: apps-metallb-config
   path: ./cluster/apps/networking/k8s-gateway/app
   prune: true
   wait: true

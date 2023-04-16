@@ -7,23 +7,24 @@ kubernetesVersion: v1.26.3
 endpoint: https://${clusterEndpointIP}:6443
 domain: cluster.local
 
+cniConfig:
+  name: none
+
 additionalMachineCertSans:
   - ${clusterEndpointIP}
   - ${clusterDomainName}
 additionalApiServerCertSans:
   - ${clusterDomainName}
 
-clusterPodNets:
-  - 10.244.0.0/16
-clusterSvcNets:
-  - 10.96.0.0/12
-
-cniConfig:
-  name: none
+# clusterPodNets:
+#   - 10.244.0.0/16
+# clusterSvcNets:
+#   - 10.96.0.0/12
 
 nodes:
   # Raspberry Pis
   - hostname: c0-pi-0.${clusterDomainName}
+    disableSearchDomain: true
     ipAddress: 10.0.6.70
     controlPlane: true
     installDisk: /dev/mmcblk0
@@ -38,6 +39,7 @@ nodes:
         vip:
           ip: ${clusterEndpointIP}
   - hostname: c0-pi-1.${clusterDomainName}
+    disableSearchDomain: true
     ipAddress: 10.0.6.71
     controlPlane: true
     installDisk: /dev/mmcblk0
@@ -53,6 +55,7 @@ nodes:
           ip: ${clusterEndpointIP}
     # VMs on "aurora"
   - hostname: c0-aurora-0.${clusterDomainName}
+    disableSearchDomain: true
     ipAddress: 10.0.6.80
     controlPlane: true
     installDisk: /dev/sda
@@ -67,6 +70,7 @@ nodes:
         vip:
           ip: ${clusterEndpointIP}
   - hostname: c0-aurora-1.${clusterDomainName}
+    disableSearchDomain: true
     ipAddress: 10.0.6.81
     installDisk: /dev/sda
     networkInterfaces:
@@ -78,6 +82,7 @@ nodes:
             gateway: 10.0.6.1
         dhcp: false
   - hostname: c0-aurora-2.${clusterDomainName}
+    disableSearchDomain: true
     ipAddress: 10.0.6.82
     installDisk: /dev/sda
     networkInterfaces:
@@ -90,6 +95,7 @@ nodes:
         dhcp: false
     # VMs on "ares"
   - hostname: c0-ares-0.${clusterDomainName}
+    disableSearchDomain: true
     ipAddress: 10.0.6.83
     controlPlane: true
     installDisk: /dev/sda
@@ -104,6 +110,7 @@ nodes:
         vip:
           ip: ${clusterEndpointIP}
   - hostname: c0-ares-1.${clusterDomainName}
+    disableSearchDomain: true
     ipAddress: 10.0.6.84
     installDisk: /dev/sda
     networkInterfaces:
@@ -115,6 +122,7 @@ nodes:
             gateway: 10.0.6.1
         dhcp: false
   - hostname: c0-ares-2.${clusterDomainName}
+    disableSearchDomain: true
     ipAddress: 10.0.6.85
     installDisk: /dev/sda
     networkInterfaces:
@@ -152,9 +160,9 @@ controlPlane:
         fs.inotify.max_user_watches: "1048576"
       network:
         extraHostEntries:
-          - aliases:
+          - ip: ${clusterEndpointIP}
+            aliases:
               - ${clusterDomainName}
-            ip: ${clusterEndpointIP}
       time:
         disabled: false
         servers:
@@ -180,9 +188,9 @@ controlPlane:
           # bind-address: 0.0.0.0
           feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
       proxy:
-        # disabled: true
-        extraArgs:
-          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+        disabled: true
+        # extraArgs:
+        #   feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
       scheduler:
         extraArgs:
           # bind-address: 0.0.0.0
@@ -221,9 +229,9 @@ worker:
         fs.inotify.max_user_watches: "1048576"
       network:
         extraHostEntries:
-          - aliases:
+          - ip: ${clusterEndpointIP}
+            aliases:
               - ${clusterDomainName}
-            ip: ${clusterEndpointIP}
       time:
         disabled: false
         servers:
