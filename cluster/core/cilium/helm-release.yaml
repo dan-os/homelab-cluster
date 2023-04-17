@@ -17,10 +17,10 @@ spec:
   interval: 30m
   values:
     autoDirectNodeRoutes: true
-    bgp:
-      announce:
-        loadbalancerIP: true
-      enabled: true
+    # bgp:
+    #   announce:
+    #     loadbalancerIP: true
+    #   enabled: true
     cluster:
       id: 0
       name: ${CLUSTER_NAME}
