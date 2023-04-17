@@ -14,5 +14,5 @@ data:
       - name: default
         protocol: bgp
         addresses:
-          - 10.45.0.0/16
+          - 10.0.6.128/25 # 10.45.0.0/16
         avoid-buggy-ips: true
