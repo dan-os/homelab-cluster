@@ -84,9 +84,9 @@ spec:
           - name: "c0-aurora-0"
             devices:
               - name: "/dev/sdb" #"/dev/disk/by-id/wwn-0x6c81f660ecb783002bc470f922f352f4" (QEMU_HARDDISK_drive-scsi2)
-          # - name: "c0-aurora-1"
-          #   devices:
-          #     - name: "sdb" # "/dev/disk/by-id/wwn-0x6c81f660ecb783002bc4711524a168e5" (QEMU_HARDDISK_drive-scsi2)
+          - name: "c0-aurora-1"
+            devices:
+              - name: "sdb" # "/dev/disk/by-id/wwn-0x6c81f660ecb783002bc4711524a168e5" (QEMU_HARDDISK_drive-scsi2)
           - name: "c0-ares-0"
             devices:
               - name: "/dev/sdb" # "/dev/disk/by-id/wwn-0x55cd2e414e04bf67" (QEMU_HARDDISK_drive-scsi2)
