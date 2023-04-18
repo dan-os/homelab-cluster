@@ -86,7 +86,7 @@ spec:
               - name: "/dev/sdb" #"/dev/disk/by-id/wwn-0x6c81f660ecb783002bc470f922f352f4" (QEMU_HARDDISK_drive-scsi2)
           - name: "c0-aurora-1"
             devices:
-              - name: "sdb" # "/dev/disk/by-id/wwn-0x6c81f660ecb783002bc4711524a168e5" (QEMU_HARDDISK_drive-scsi2)
+              - name: "/dev/sdb" # "/dev/disk/by-id/wwn-0x6c81f660ecb783002bc4711524a168e5" (QEMU_HARDDISK_drive-scsi2)
           - name: "c0-ares-0"
             devices:
               - name: "/dev/sdb" # "/dev/disk/by-id/wwn-0x55cd2e414e04bf67" (QEMU_HARDDISK_drive-scsi2)
@@ -112,7 +112,7 @@ spec:
         spec:
           failureDomain: host
           replicated:
-            size: 3
+            size: 2
         storageClass:
           enabled: true
           name: ceph-block
@@ -134,11 +134,11 @@ spec:
         spec:
           metadataPool:
             replicated:
-              size: 3
+              size: 2
           dataPools:
             - failureDomain: host
               replicated:
-                size: 3
+                size: 2
           metadataServer:
             activeCount: 1
             activeStandby: true
@@ -169,7 +169,7 @@ spec:
           metadataPool:
             failureDomain: host
             replicated:
-              size: 3
+              size: 2
           dataPool:
             failureDomain: host
             erasureCoded:
