@@ -6,4 +6,4 @@ resources:
   - kube-system
   - kyverno
   - networking
-  - rook-ceph
+  # - rook-ceph
