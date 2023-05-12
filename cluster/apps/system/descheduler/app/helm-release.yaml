@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: descheduler
-      version: 0.26.1
+      version: 0.27.0
       sourceRef:
         kind: HelmRepository
         name: kubernetes-sigs-descheduler-charts
@@ -25,9 +25,9 @@ spec:
     resources:
       requests:
         cpu: 15m
-        memory: 64M
+        memory: 48M
       limits:
-        memory: 143M
+        memory: 48M
     deschedulerPolicy:
       strategies:
         RemoveDuplicates:

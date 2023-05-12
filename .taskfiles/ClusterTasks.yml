@@ -7,6 +7,12 @@ tasks:
     cmds:
       - flux check --pre
 
+  bootstrap:
+    desc: Bootstrap integrations required before flux (cilium)
+    cmds:
+      - cd {{.PROJECT_DIR}}/setup/bootstrap/cni && kubectl kustomize --enable-helm --load-restrictor LoadRestrictionsNone > install.yaml
+      - kubectl apply -f {{.PROJECT_DIR}}/setup/bootstrap/cni/install.yaml
+
   install:
     desc: Install Flux into your cluster
     cmds:

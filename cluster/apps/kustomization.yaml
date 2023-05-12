@@ -5,6 +5,6 @@ resources:
   - flux-system
   - kube-system
   - kyverno
-  - networking
-  - rook-ceph
+  - network
+  # - rook-ceph
   - system

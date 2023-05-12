@@ -8,13 +8,13 @@ spec:
   nodeName: c0-ares-0
   containers:
     - name: fake-ssh
-      image: ghcr.io/onedr0p/alpine:3.17.3@sha256:e6a2407a15b7e557fb6617a592f672b004b6764887438502c047a567ec616e40
+      image: ghcr.io/onedr0p/alpine:3.18.0@sha256:dd504f02473c176a0e68e4550ccaf6f6c0f14e9f64c08a59877f9c6153bf48a9
       securityContext:
         privileged: true
       resources: {}
       env:
         - name: CRICTL_VERSION
-          value: v1.26.1
+          value: v1.26.0
         - name: CONTAINER_RUNTIME_ENDPOINT
           value: unix:///run/containerd/containerd.sock
         - name: IMAGE_SERVICE_ENDPOINT

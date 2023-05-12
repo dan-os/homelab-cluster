@@ -1,0 +1,7 @@
+---
+ingress:
+  - hostname: "*.dan.sm"
+    service: https://ingress-nginx-controller.network.svc.cluster.local:443
+    originRequest:
+      originServerName: "ingress.dan.sm"
+  - service: http_status:404

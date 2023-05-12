@@ -2,7 +2,23 @@
 version: "3"
 
 tasks:
-  nuke:
-    desc: Nuke the TalOS machines
+  update:
+    desc: Update TalOS nodes (use --insecure to bootstrap)
     cmds:
-      - talosctl reset --reboot --graceful=false --nodes 10.0.6.80,10.0.6.81,10.0.6.82,10.0.6.83,10.0.6.84,10.0.6.85
+      - talosctl apply-config -f {{.PROJECT_DIR}}/setup/talos/clusterconfig/homelab-cluster-c0-ares-0.dan.sm.yaml --nodes c0-ares-0.dan.sm {{.CLI_ARGS}}
+      - talosctl apply-config -f {{.PROJECT_DIR}}/setup/talos/clusterconfig/homelab-cluster-c0-ares-1.dan.sm.yaml --nodes c0-ares-1.dan.sm {{.CLI_ARGS}}
+      - talosctl apply-config -f {{.PROJECT_DIR}}/setup/talos/clusterconfig/homelab-cluster-c0-ares-2.dan.sm.yaml --nodes c0-ares-2.dan.sm {{.CLI_ARGS}}
+      - talosctl apply-config -f {{.PROJECT_DIR}}/setup/talos/clusterconfig/homelab-cluster-c0-aurora-0.dan.sm.yaml --nodes c0-aurora-0.dan.sm {{.CLI_ARGS}}
+      - talosctl apply-config -f {{.PROJECT_DIR}}/setup/talos/clusterconfig/homelab-cluster-c0-aurora-1.dan.sm.yaml --nodes c0-aurora-1.dan.sm {{.CLI_ARGS}}
+      - talosctl apply-config -f {{.PROJECT_DIR}}/setup/talos/clusterconfig/homelab-cluster-c0-aurora-2.dan.sm.yaml --nodes c0-aurora-2.dan.sm {{.CLI_ARGS}}
+      - talosctl apply-config -f {{.PROJECT_DIR}}/setup/talos/clusterconfig/homelab-cluster-c0-pi-0.dan.sm.yaml --nodes c0-pi-0.dan.sm {{.CLI_ARGS}}
+
+  bootstrap:
+    desc: Bootstrap the first TalOS node (run :update first!)
+    cmds:
+      - talosctl bootstrap --nodes c0-ares-0.dan.sm
+
+  nuke:
+    desc: Nuke TalOS nodes
+    cmds:
+      - talosctl reset --reboot --graceful=false --nodes c0-ares-0.dan.sm,c0-ares-1.dan.sm,c0-ares-2.dan.sm,c0-aurora-0.dan.sm,c0-aurora-1.dan.sm,c0-aurora-2.dan.sm,c0-pi-0.dan.sm

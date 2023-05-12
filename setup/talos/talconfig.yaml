@@ -1,10 +1,10 @@
 ---
 clusterName: homelab-cluster
 
-talosVersion: v1.3.6
-kubernetesVersion: v1.26.3
+talosVersion: v1.4.2
+kubernetesVersion: v1.26.4
 
-endpoint: https://${clusterEndpointIP}:6443
+endpoint: https://${clusterName}.${domainName}:6443
 domain: cluster.local
 
 cniConfig:
@@ -12,9 +12,9 @@ cniConfig:
 
 additionalMachineCertSans:
   - ${clusterEndpointIP}
-  - ${clusterDomainName}
+  - ${clusterName}.${domainName}
 additionalApiServerCertSans:
-  - ${clusterDomainName}
+  - ${clusterEndpointIP}
 
 # clusterPodNets:
 #   - 10.244.0.0/16
@@ -23,116 +23,68 @@ additionalApiServerCertSans:
 
 nodes:
   # Raspberry Pis
-  - hostname: c0-pi-0.${clusterDomainName}
+  - hostname: c0-pi-0.${domainName}
     disableSearchDomain: true
-    ipAddress: 10.0.6.70
+    ipAddress: 10.1.1.21
     controlPlane: true
     installDisk: /dev/mmcblk0
     networkInterfaces:
       - interface: eth0
-        addresses:
-          - 10.0.6.70/24
-        routes:
-          - network: 0.0.0.0/0
-            gateway: 10.0.6.1
-        dhcp: false
-        vip:
-          ip: ${clusterEndpointIP}
-  - hostname: c0-pi-1.${clusterDomainName}
+        dhcp: true
+  - hostname: c0-pi-1.${domainName}
     disableSearchDomain: true
-    ipAddress: 10.0.6.71
+    ipAddress: 10.1.1.22
     controlPlane: true
     installDisk: /dev/mmcblk0
     networkInterfaces:
       - interface: eth0
-        addresses:
-          - 10.0.6.71/24
-        routes:
-          - network: 0.0.0.0/0
-            gateway: 10.0.6.1
-        dhcp: false
-        vip:
-          ip: ${clusterEndpointIP}
-    # VMs on "aurora"
-  - hostname: c0-aurora-0.${clusterDomainName}
-    disableSearchDomain: true
-    ipAddress: 10.0.6.80
-    controlPlane: true
-    installDisk: /dev/sda
-    networkInterfaces:
-      - interface: eth0
-        addresses:
-          - 10.0.6.80/24
-        routes:
-          - network: 0.0.0.0/0
-            gateway: 10.0.6.1
-        dhcp: false
-        vip:
-          ip: ${clusterEndpointIP}
-  - hostname: c0-aurora-1.${clusterDomainName}
-    disableSearchDomain: true
-    ipAddress: 10.0.6.81
-    installDisk: /dev/sda
-    networkInterfaces:
-      - interface: eth0
-        addresses:
-          - 10.0.6.81/24
-        routes:
-          - network: 0.0.0.0/0
-            gateway: 10.0.6.1
-        dhcp: false
-  - hostname: c0-aurora-2.${clusterDomainName}
-    disableSearchDomain: true
-    ipAddress: 10.0.6.82
-    installDisk: /dev/sda
-    networkInterfaces:
-      - interface: eth0
-        addresses:
-          - 10.0.6.82/24
-        routes:
-          - network: 0.0.0.0/0
-            gateway: 10.0.6.1
-        dhcp: false
+        dhcp: true
     # VMs on "ares"
-  - hostname: c0-ares-0.${clusterDomainName}
+  - hostname: c0-ares-0.${domainName}
     disableSearchDomain: true
-    ipAddress: 10.0.6.83
+    ipAddress: 10.1.1.31
     controlPlane: true
     installDisk: /dev/sda
     networkInterfaces:
       - interface: eth0
-        addresses:
-          - 10.0.6.83/24
-        routes:
-          - network: 0.0.0.0/0
-            gateway: 10.0.6.1
-        dhcp: false
-        vip:
-          ip: ${clusterEndpointIP}
-  - hostname: c0-ares-1.${clusterDomainName}
+        dhcp: true
+  - hostname: c0-ares-1.${domainName}
     disableSearchDomain: true
-    ipAddress: 10.0.6.84
+    ipAddress: 10.1.1.32
     installDisk: /dev/sda
     networkInterfaces:
       - interface: eth0
-        addresses:
-          - 10.0.6.84/24
-        routes:
-          - network: 0.0.0.0/0
-            gateway: 10.0.6.1
-        dhcp: false
-  - hostname: c0-ares-2.${clusterDomainName}
+        dhcp: true
+  - hostname: c0-ares-2.${domainName}
     disableSearchDomain: true
-    ipAddress: 10.0.6.85
+    ipAddress: 10.1.1.33
     installDisk: /dev/sda
     networkInterfaces:
       - interface: eth0
-        addresses:
-          - 10.0.6.85/24
-        routes:
-          - network: 0.0.0.0/0
-            gateway: 10.0.6.1
-        dhcp: false
+        dhcp: true
+    # VMs on "aurora"
+  - hostname: c0-aurora-0.${domainName}
+    disableSearchDomain: true
+    ipAddress: 10.1.1.34
+    controlPlane: true
+    installDisk: /dev/sda
+    networkInterfaces:
+      - interface: eth0
+        dhcp: true
+  - hostname: c0-aurora-1.${domainName}
+    disableSearchDomain: true
+    ipAddress: 10.1.1.35
+    installDisk: /dev/sda
+    networkInterfaces:
+      - interface: eth0
+        dhcp: true
+  - hostname: c0-aurora-2.${domainName}
+    disableSearchDomain: true
+    ipAddress: 10.1.1.36
+    installDisk: /dev/sda
+    networkInterfaces:
+      - interface: eth0
+        dhcp: true
 
 controlPlane:
   inlinePatch:
@@ -162,11 +114,11 @@ controlPlane:
         extraHostEntries:
           - ip: ${clusterEndpointIP}
             aliases:
-              - ${clusterDomainName}
+              - ${clusterName}.${domainName}
       time:
         disabled: false
         servers:
-          - time.cloudflare.com
+          - 10.1.1.1
     cluster:
       secret: ${clusterSecret}
       token: ${clusterToken}
@@ -231,11 +183,11 @@ worker:
         extraHostEntries:
           - ip: ${clusterEndpointIP}
             aliases:
-              - ${clusterDomainName}
+              - ${clusterName}.${domainName}
       time:
         disabled: false
         servers:
-          - time.cloudflare.com
+          - 10.1.1.1
     cluster:
       secret: ${clusterSecret}
       token: ${clusterToken}
