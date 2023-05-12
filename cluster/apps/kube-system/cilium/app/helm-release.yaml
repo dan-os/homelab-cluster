@@ -21,7 +21,7 @@ spec:
   values:
     bgp:
       enabled: true
-    # hubble:
+    hubble:
     #   metrics:
     #     serviceMonitor:
     #       enabled: true
