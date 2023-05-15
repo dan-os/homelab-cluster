@@ -5,27 +5,35 @@ metadata:
   name: kyverno
   namespace: kyverno
 spec:
-  interval: 30m
+  interval: 15m
   chart:
     spec:
       chart: kyverno
-      version: 2.7.2
+      version: 2.7.3
       sourceRef:
         kind: HelmRepository
         name: kyverno-charts
         namespace: flux-system
-      interval: 30m
+      interval: 15m
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
   values:
     crds:
       install: true
-
     replicaCount: 3
-
     updateStrategy:
       type: RollingUpdate
       rollingUpdate:
         maxSurge: 1
-
     # grafana:
     #   enabled: true
     # serviceMonitor:
@@ -40,14 +48,6 @@ spec:
     # reportsController:
     #   serviceMonitor:
     #     enabled: true
-
-    resources:
-      requests:
-        cpu: 247m
-        memory: 443M
-      limits:
-        memory: 1336M
-
     topologySpreadConstraints:
       - maxSkew: 1
         topologyKey: kubernetes.io/hostname
@@ -55,3 +55,4 @@ spec:
         labelSelector:
           matchLabels:
             app.kubernetes.io/instance: kyverno
+            app.kubernetes.io/component: kyverno

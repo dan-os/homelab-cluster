@@ -5,7 +5,7 @@ metadata:
   name: cloudflared
   namespace: network
 spec:
-  interval: 30m
+  interval: 15m
   chart:
     spec:
       chart: app-template
@@ -54,29 +54,19 @@ spec:
     #         path: /metrics
     #         interval: 1m
     #         scrapeTimeout: 30s
-    # probes:
-    #   liveness:
-    #     enabled: true
-    #     custom: true
-    #     spec:
-    #       httpGet:
-    #         path: /ready
-    #         port: http
-    #       initialDelaySeconds: 0
-    #       periodSeconds: 10
-    #       timeoutSeconds: 1
-    #       failureThreshold: 3
-    #   readiness:
-    #     enabled: true
-    #     custom: true
-    #     spec:
-    #       httpGet:
-    #         path: /ready
-    #         port: http
-    #       initialDelaySeconds: 0
-    #       periodSeconds: 10
-    #       timeoutSeconds: 1
-    #       failureThreshold: 3
+    probes:
+      liveness: &probes
+        enabled: true
+        custom: true
+        spec:
+          httpGet:
+            path: /ready
+            port: http
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          timeoutSeconds: 1
+          failureThreshold: 3
+      readiness: *probes
     #   startup:
     #     enabled: true
     #     custom: true
@@ -113,4 +103,4 @@ spec:
         cpu: 5m
         memory: 30Mi
       limits:
-        memory: 128Mi
+        memory: 256Mi

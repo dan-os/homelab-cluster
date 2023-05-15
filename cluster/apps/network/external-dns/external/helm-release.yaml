@@ -5,7 +5,7 @@ metadata:
   name: externaldns-external
   namespace: network
 spec:
-  interval: 30m
+  interval: 15m
   chart:
     spec:
       chart: external-dns
@@ -14,11 +14,23 @@ spec:
         kind: HelmRepository
         name: external-dns-charts
         namespace: flux-system
-      interval: 30m
+      interval: 15m
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
   values:
     fullnameOverride: &name externaldns-external
-    domainFilters:
-      - "${DOMAIN}"
+    podAnnotations:
+      secret.reloader.stakater.com/reload: externaldns-external-secrets
+    provider: cloudflare
     env:
       - name: CF_API_TOKEN
         valueFrom:
@@ -30,22 +42,15 @@ spec:
       - --crd-source-kind=DNSEndpoint
       - --cloudflare-proxied
       - --annotation-filter=external-dns.alpha.kubernetes.io/target
-    podAnnotations:
-      secret.reloader.stakater.com/reload: externaldns-external-secrets
     policy: sync
-    provider: cloudflare
-    resources:
-      requests:
-        cpu: 5m
-        memory: 24M
-      limits:
-        memory: 24M
-    # serviceMonitor:
-    #   enabled: true
     sources:
       - ingress
       - crd
+    domainFilters:
+      - "${DOMAIN}"
     txtPrefix: "k8s."
+    # serviceMonitor:
+    #   enabled: true
   postRenderers:
     - kustomize:
         patches:

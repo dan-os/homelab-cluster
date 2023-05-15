@@ -5,7 +5,7 @@ metadata:
   name: descheduler
   namespace: system
 spec:
-  interval: 30m
+  interval: 15m
   chart:
     spec:
       chart: descheduler
@@ -14,20 +14,20 @@ spec:
         kind: HelmRepository
         name: kubernetes-sigs-descheduler-charts
         namespace: flux-system
-      interval: 30m
+      interval: 15m
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
   values:
     kind: Deployment
-    replicas: 2
-    leaderElection:
-      enabled: true
-    # podAnnotations:
-    #   configmap.reloader.stakater.com/reload: "descheduler"
-    resources:
-      requests:
-        cpu: 15m
-        memory: 48M
-      limits:
-        memory: 48M
     deschedulerPolicy:
       strategies:
         RemoveDuplicates:

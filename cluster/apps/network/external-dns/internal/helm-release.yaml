@@ -5,7 +5,7 @@ metadata:
   name: externaldns-internal
   namespace: network
 spec:
-  interval: 30m
+  interval: 15m
   chart:
     spec:
       chart: external-dns
@@ -14,11 +14,23 @@ spec:
         kind: HelmRepository
         name: external-dns-charts
         namespace: flux-system
-      interval: 30m
+      interval: 15m
+  maxHistory: 2
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
   values:
     fullnameOverride: &name externaldns-internal
-    domainFilters:
-      - "${DOMAIN}"
+    podAnnotations:
+      secret.reloader.stakater.com/reload: externaldns-internal-secrets
+    provider: rfc2136
     env:
       - name: EXTERNAL_DNS_RFC2136_HOST
         value: "${INTERNAL_DNS_HOST}"
@@ -40,22 +52,15 @@ spec:
           secretKeyRef:
             name: externaldns-internal-secrets
             key: bind_rndc_secret
-    podAnnotations:
-      secret.reloader.stakater.com/reload: externaldns-internal-secrets
     policy: sync
-    provider: rfc2136
-    resources:
-      requests:
-        cpu: 5m
-        memory: 49M
-      limits:
-        memory: 49M
-    # serviceMonitor:
-    #   enabled: true
     sources:
       - ingress
       - service
+    domainFilters:
+      - "${DOMAIN}"
     txtPrefix: "k8s."
+    # serviceMonitor:
+    #   enabled: true
   postRenderers:
     - kustomize:
         patches:

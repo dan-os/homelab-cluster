@@ -5,7 +5,7 @@ metadata:
   name: ingress-nginx
   namespace: network
 spec:
-  interval: 30m
+  interval: 15m
   chart:
     spec:
       chart: ingress-nginx
@@ -14,14 +14,21 @@ spec:
         kind: HelmRepository
         name: ingress-nginx-charts
         namespace: flux-system
-      interval: 30m
+      interval: 15m
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
   upgrade:
     cleanupOnFail: true
+    remediation:
+      retries: 3
   uninstall:
     keepHistory: false
   values:
     controller:
-      replicaCount: 3
+      replicaCount: 2
       updateStrategy:
         type: RollingUpdate
       extraEnvs:
@@ -32,6 +39,7 @@ spec:
         type: LoadBalancer
         loadBalancerIP: "${NGINX_INGRESS_ADDR}"
         annotations:
+          io.cilium/lb-ipam-ips: ${NGINX_INGRESS_ADDR}
           external-dns.alpha.kubernetes.io/hostname: "ingress.${DOMAIN}"
         externalTrafficPolicy: Local
       publishService:
@@ -43,11 +51,11 @@ spec:
         client-body-buffer-size: "100M"
         client-body-timeout: 120
         enable-brotli: "true"
-        forwarded-for-header: "CF-Connecting-IP"
         enable-real-ip: "true"
         hsts-max-age: "31449600"
         keep-alive: 120
         keep-alive-requests: 10000
+        forwarded-for-header: "CF-Connecting-IP"
         use-forwarded-headers: "true"
         log-format-escape-json: "true"
         log-format-upstream: >-
@@ -72,7 +80,7 @@ spec:
       extraArgs:
         default-ssl-certificate: "network/${DOMAIN/./-}-prod-tls"
       topologySpreadConstraints:
-        - maxSkew: 2
+        - maxSkew: 1
           topologyKey: kubernetes.io/hostname
           whenUnsatisfiable: DoNotSchedule
           labelSelector:
@@ -82,16 +90,16 @@ spec:
       resources:
         requests:
           cpu: 23m
-          memory: 381M
+          memory: 588M
         limits:
-          memory: 463M
+          memory: 855M
     defaultBackend:
       enabled: true
       image:
         repository: ghcr.io/tarampampam/error-pages
-        tag: 2.21.0
+        tag: 2.24.0
       extraEnvs:
         - name: TEMPLATE_NAME
-          value: lost-in-space
+          value: i-said-random
         - name: SHOW_DETAILS
           value: "false"
