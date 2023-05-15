@@ -5,7 +5,7 @@ metadata:
   name: rook-ceph-rook-ceph
   namespace: flux-system
 spec:
-  path: ./cluster/apps/rook-ceph/rook-ceph/app
+  path: "./cluster/apps/rook-ceph/rook-ceph/operator"
   sourceRef:
     kind: GitRepository
     name: flux-cluster
@@ -19,7 +19,7 @@ metadata:
   name: rook-ceph-rook-ceph-cluster
   namespace: flux-system
 spec:
-  path: ./cluster/apps/rook-ceph/rook-ceph/cluster
+  path: "./cluster/apps/rook-ceph/rook-ceph/cluster"
   sourceRef:
     kind: GitRepository
     name: flux-cluster

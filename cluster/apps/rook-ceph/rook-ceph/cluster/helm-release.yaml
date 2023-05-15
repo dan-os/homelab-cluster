@@ -5,15 +5,27 @@ metadata:
   name: rook-ceph-cluster
   namespace: rook-ceph
 spec:
-  interval: 30m
+  interval: 15m
   chart:
     spec:
       chart: rook-ceph-cluster
-      version: v1.11.3
+      version: v1.11.5
       sourceRef:
         kind: HelmRepository
         name: rook-ceph-charts
         namespace: flux-system
+      interval: 15m
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
   values:
     toolbox:
       enabled: true
@@ -24,6 +36,7 @@ spec:
       [global]
       bdev_enable_discard = true
       bdev_async_discard = true
+      bluefs_buffered_io = false
     cephClusterSpec:
       network:
         provider: host
@@ -33,17 +46,18 @@ spec:
             cpu: "125m"
             memory: "549M"
           limits:
-            memory: "1219M"
+            cpu: 2
+            memory: "1485M"
         mon:
           requests:
             cpu: "49m"
-            memory: "477M"
+            memory: "1165M"
           limits:
-            memory: "1059M"
+            memory: "3390M"
         osd:
           requests:
-            cpu: "442m"
-            memory: "2678M"
+            cpu: "511m"
+            memory: "4067M"
           limits:
             memory: "5944M"
         mgr-sidecar:
@@ -51,7 +65,7 @@ spec:
             cpu: "49m"
             memory: "94M"
           limits:
-            memory: "208M"
+            memory: "227M"
         crashcollector:
           requests:
             cpu: "15m"
@@ -105,8 +119,6 @@ spec:
         tls:
           - hosts:
               - *host
-    cephBlockPoolsVolumeSnapshotClass:
-      enabled: false
     cephBlockPools:
       - name: ceph-blockpool
         spec:
@@ -142,12 +154,6 @@ spec:
           metadataServer:
             activeCount: 1
             activeStandby: true
-            resources:
-              requests:
-                cpu: "35m"
-                memory: "64M"
-              limits:
-                memory: "144M"
         storageClass:
           enabled: true
           isDefault: false
@@ -163,34 +169,4 @@ spec:
             csi.storage.k8s.io/node-stage-secret-name: rook-csi-cephfs-node
             csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
             csi.storage.k8s.io/fstype: ext4
-    cephObjectStores:
-      - name: ceph-objectstore
-        spec:
-          metadataPool:
-            failureDomain: host
-            replicated:
-              size: 2
-          dataPool:
-            failureDomain: host
-            erasureCoded:
-              dataChunks: 2
-              codingChunks: 1
-          preservePoolsOnDelete: true
-          gateway:
-            port: 80
-            resources:
-              requests:
-                cpu: 100m
-                memory: 128M
-              limits:
-                memory: 2Gi
-            instances: 1
-          healthCheck:
-            bucket:
-              interval: 60s
-        storageClass:
-          enabled: true
-          name: ceph-bucket
-          reclaimPolicy: Delete
-          parameters:
-            region: us-east-1
+    cephObjectStores: []
